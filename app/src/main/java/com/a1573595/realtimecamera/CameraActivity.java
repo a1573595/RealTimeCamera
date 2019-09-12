@@ -19,11 +19,11 @@ import com.a1573595.realtimecamera.tflite.ImageUtils;
 public abstract class CameraActivity extends BaseActivity implements Camera.PreviewCallback{
     private Logger logger = new Logger(this.getClass());
 
-    private final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
-    private final int REQUEST_CAMERA = 1;
+    private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
+    private static final int REQUEST_CAMERA = 1;
 
-    protected int previewWidth = 0;
-    protected int previewHeight = 0;
+    protected int previewWidth;
+    protected int previewHeight;
 
     private Handler handler;
     private HandlerThread handlerThread;
@@ -92,7 +92,7 @@ public abstract class CameraActivity extends BaseActivity implements Camera.Prev
                 onPreviewSizeChosen(new Size(previewSize.width, previewSize.height), getScreenOrientation());//3 調整補償角度
             }
         } catch (final Exception e) {
-            //LOGGER.e(e, "Exception!");
+            logger.e(e.toString());
             return;
         }
         isProcessingFrame = true;
