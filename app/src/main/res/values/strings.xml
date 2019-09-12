@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RealTimeCamera</string>
+    <string name="permission_required">Permission is required for this application.</string>
 </resources>
