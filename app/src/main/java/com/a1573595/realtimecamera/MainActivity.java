@@ -1,18 +1,22 @@
 package com.a1573595.realtimecamera;
 
-import android.Manifest;
-import android.os.Bundle;
+import android.util.Size;
 
-public class MainActivity extends BaseActivity {
-    private final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
-    private final int REQUEST_CAMERA = 1;
+public class MainActivity extends CameraActivity {
+    private final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected Size getDesiredPreviewFrameSize() {
+        return DESIRED_PREVIEW_SIZE;
+    }
 
-        if(!hasPermissions(PERMISSION_CAMERA))
-            requestPermission(REQUEST_CAMERA, PERMISSION_CAMERA);
+    @Override
+    protected void onPreviewSizeChosen(Size size, int rotation) {
+
+    }
+
+    @Override
+    protected void processImage() {
+
     }
 }
