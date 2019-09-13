@@ -8,15 +8,24 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Size;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 import com.a1573595.realtimecamera.tflite.Classifier;
-import com.a1573595.realtimecamera.tflite.ClassificationModel;
+import com.a1573595.realtimecamera.tflite.BinaryClassificationModel;
 import com.a1573595.realtimecamera.tflite.ImageUtils;
+import com.asus.robotframework.API.RobotAPI;
+import com.asus.robotframework.API.RobotCallback;
+import com.asus.robotframework.API.RobotCmdState;
+import com.asus.robotframework.API.RobotCommand;
+import com.asus.robotframework.API.RobotErrorCode;
+import com.asus.robotframework.API.RobotFace;
+import com.asus.robotframework.API.WheelLights;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class MainActivity extends CameraActivity {
     private Logger logger = new Logger(this.getClass());
@@ -43,10 +52,91 @@ public class MainActivity extends CameraActivity {
 
     private TextView tv_debug;
 
+    private RobotAPI robotAPI;
+    private RobotCallback robotCallback;
+
+    private int serialStatus = -1;
+    private boolean[] framArray = new boolean[3];
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tv_debug = findViewById(R.id.tv_debug);
+
+        initZenbo();
+    }
+
+    private void initZenbo() {
+        initRobotCallback();
+        robotAPI = new RobotAPI(getApplicationContext(), robotCallback);
+    }
+
+    private void initRobotCallback() {
+        robotCallback = new RobotCallback() {
+            @Override
+            public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
+                super.onResult(cmd, serial, err_code, result);
+            }
+
+            @Override
+            public void onStateChange(int cmd, int serial, RobotErrorCode err_code, RobotCmdState state) {
+                super.onStateChange(cmd, serial, err_code, state);
+
+                logger.i(RobotCommand.getRobotCommand(cmd).name()
+                        + ", serial:" + serial + ", state:" + state.ordinal());
+
+                switch (RobotCommand.getRobotCommand(cmd).name()) {
+                    case "SPEAK":
+                        if(state.ordinal()==3); // Start
+                        if(state.ordinal()==5 && serial == serialStatus){   //End
+                            robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                            robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xff);
+                            robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0x00FF00);
+                            robotAPI.wheelLights.setBrightness(WheelLights.Lights.SYNC_BOTH, 0xff, 25);
+
+                            Arrays.fill(framArray, false);
+                            serialStatus = -1;
+                        }
+                        break;
+                    case "PLAY_EMOTIONAL_ACTION":
+                        break;
+                }
+            }
+
+            @Override
+            public void initComplete() {
+                super.initComplete();
+
+            }
+        };
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        );
+        computingImage = false;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(robotAPI!=null)
+            robotAPI.robot.unregisterListenCallback();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(robotAPI!=null)
+            robotAPI.release();
     }
 
     @Override
@@ -60,7 +150,7 @@ public class MainActivity extends CameraActivity {
 
         try {
             detector =
-                    ClassificationModel.create(
+                    BinaryClassificationModel.create(
                             getAssets(),
                             MODEL_FILE,
                             MODEL_INPUT_SIZE,
@@ -138,6 +228,23 @@ public class MainActivity extends CameraActivity {
                     runOnUiThread(
                             () -> {
                                 tv_debug.setText(lastProcessingTimeMs +"ms\n"+ result);
+
+                                if(serialStatus!=-1) return;
+
+                                for(int i=framArray.length-1;i>=0;i--){
+                                    framArray[i] = ((i>0)?framArray[i-1]:result);
+                                }
+
+                                if(Arrays.equals(framArray, new boolean[]{true, true, true})) {
+                                    serialStatus = robotAPI.robot.speak("Please don't hurt me, I can tell you some secrets about Patrick.");
+                                    robotAPI.utility.playEmotionalAction(
+                                            RobotFace.SHOCKED,
+                                            -1
+                                    );
+                                    robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xff);
+                                    robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0xFF0000);
+                                    robotAPI.wheelLights.setBrightness(WheelLights.Lights.SYNC_BOTH, 0xff, 25);
+                                }
                             });
                 });
     }

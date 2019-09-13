@@ -13,7 +13,7 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-public class ClassificationModel implements Classifier {
+public class BinaryClassificationModel implements Classifier {
     // Float model
     private static final float IMAGE_MEAN = 128.0f;
     private static final float IMAGE_STD = 128.0f;
@@ -26,7 +26,7 @@ public class ClassificationModel implements Classifier {
     private ByteBuffer imgData;
     private float[][] outResult = new float[1][1];
 
-    private void ImageClassificationModel() {}
+    private void ClassificationModel() {}
 
     public static Classifier create(
             final AssetManager assetManager,
@@ -34,7 +34,7 @@ public class ClassificationModel implements Classifier {
             final int inputSize,
             final boolean isQuantized)
             throws IOException {
-        final ClassificationModel d = new ClassificationModel();
+        final BinaryClassificationModel d = new BinaryClassificationModel();
 
         d.inputSize = inputSize;
         d.isModelQuantized = isQuantized;
