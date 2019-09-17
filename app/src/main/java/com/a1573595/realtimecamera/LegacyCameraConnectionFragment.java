@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import com.a1573595.realtimecamera.customView.AutoFitTextureView;
 import com.a1573595.realtimecamera.tflite.ImageUtils;
+import com.a1573595.realtimecamera.tool.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;

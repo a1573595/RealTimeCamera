@@ -13,7 +13,7 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-public class BinaryClassificationModel implements Classifier {
+public class BinaryClassificationModel implements BinaryClassifier {
     // Float model
     private static final float IMAGE_MEAN = 128.0f;
     private static final float IMAGE_STD = 128.0f;
@@ -28,7 +28,7 @@ public class BinaryClassificationModel implements Classifier {
 
     private void ClassificationModel() {}
 
-    public static Classifier create(
+    public static BinaryClassifier create(
             final AssetManager assetManager,
             final String modelFileName,
             final int inputSize,
@@ -63,8 +63,7 @@ public class BinaryClassificationModel implements Classifier {
     }
 
     /** Memory-map the model file in Assets. */
-    private static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename)
-            throws IOException {
+    static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename) throws IOException {
         AssetFileDescriptor fileDescriptor = assets.openFd(modelFilename);
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
         FileChannel fileChannel = inputStream.getChannel();

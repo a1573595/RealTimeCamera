@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.a1573595.realtimecamera.tflite.ImageUtils;
+import com.a1573595.realtimecamera.tool.Logger;
 
 public abstract class CameraActivity extends BaseActivity implements Camera.PreviewCallback{
     private Logger logger = new Logger(this.getClass());
