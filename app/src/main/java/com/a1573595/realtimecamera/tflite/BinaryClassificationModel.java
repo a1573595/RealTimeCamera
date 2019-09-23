@@ -15,8 +15,8 @@ import java.nio.channels.FileChannel;
 
 public class BinaryClassificationModel implements BinaryClassifier {
     // Float model
-    private static final float IMAGE_MEAN = 128.0f;
-    private static final float IMAGE_STD = 128.0f;
+    private static final float IMAGE_MEAN = 0f;
+    private static final float IMAGE_STD = 255.0f;
 
     private Interpreter tfLite;
     private int inputSize;
@@ -26,7 +26,7 @@ public class BinaryClassificationModel implements BinaryClassifier {
     private ByteBuffer imgData;
     private float[][] outResult = new float[1][1];
 
-    private void ClassificationModel() {}
+    private void BinaryClassificationModel() {}
 
     public static BinaryClassifier create(
             final AssetManager assetManager,

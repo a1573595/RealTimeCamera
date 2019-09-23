@@ -56,7 +56,7 @@ public class BinaryClassificationActivity extends CameraActivity {
     private RobotCallback robotCallback;
 
     private int serialStatus = -1;
-    private boolean[] framArray = new boolean[3];
+    private boolean[] frameArray = new boolean[3];
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,7 +94,7 @@ public class BinaryClassificationActivity extends CameraActivity {
                             robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0x00FF00);
                             robotAPI.wheelLights.setBrightness(WheelLights.Lights.SYNC_BOTH, 0xff, 25);
 
-                            Arrays.fill(framArray, false);
+                            Arrays.fill(frameArray, false);
                             serialStatus = -1;
                         }
                         break;
@@ -229,11 +229,11 @@ public class BinaryClassificationActivity extends CameraActivity {
 
                                 if(serialStatus!=-1) return;
 
-                                for(int i=framArray.length-1;i>=0;i--){
-                                    framArray[i] = ((i>0)?framArray[i-1]:result);
+                                for(int i=frameArray.length-1;i>=0;i--){
+                                    frameArray[i] = ((i>0)?frameArray[i-1]:result);
                                 }
 
-                                if(Arrays.equals(framArray, new boolean[]{true, true, true})) {
+                                if(Arrays.equals(frameArray, new boolean[]{true, true, true})) {
                                     serialStatus = robotAPI.robot.speak("Please don't hurt me, I can tell you some secrets about Patrick.");
                                     robotAPI.utility.playEmotionalAction(
                                             RobotFace.SHOCKED,

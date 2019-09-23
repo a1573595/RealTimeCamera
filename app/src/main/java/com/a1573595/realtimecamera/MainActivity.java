@@ -14,7 +14,8 @@ import com.asus.robotframework.API.RobotFace;
 
 public class MainActivity extends AppCompatActivity {
     private ListView listView;
-    private String[] features = new String[]{"ObjectDetection", "BinaryClassification"};
+    private String[] features = new String[]{"ObjectDetection", "GunBinaryClassification",
+            "LogoClassification"};
 
     private RobotAPI robotAPI;
 
@@ -37,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 1:
                     startActivity(new Intent(this, BinaryClassificationActivity.class));
+                    break;
+                case 2:
+                    startActivity(new Intent(this, LogoClassificationActivity.class));
                     break;
             }
         });

@@ -16,7 +16,7 @@ import androidx.annotation.Nullable;
 import com.a1573595.realtimecamera.customView.OverlayView;
 import com.a1573595.realtimecamera.tflite.ImageUtils;
 import com.a1573595.realtimecamera.tflite.MultiBoxTracker;
-import com.a1573595.realtimecamera.tflite.MultipleClassifier;
+import com.a1573595.realtimecamera.tflite.ObjectionDetector;
 import com.a1573595.realtimecamera.tflite.ObjectionDetectionModel;
 import com.a1573595.realtimecamera.tool.Logger;
 
@@ -38,7 +38,7 @@ public class ObjectDetectionActivity extends CameraActivity {
 
     private boolean HAS_FRONT_CAMERA = false;
 
-    private MultipleClassifier detector;
+    private ObjectionDetector detector;
 
     private long timestamp = 0;
     private boolean computingImage = false;
@@ -158,14 +158,14 @@ public class ObjectDetectionActivity extends CameraActivity {
                 () -> {
                     final long startTime = SystemClock.uptimeMillis();
                     // 輸出結果
-                    final List<MultipleClassifier.Recognition> results = detector.recognizeImage(
+                    final List<ObjectionDetector.Recognition> results = detector.recognizeImage(
                             HAS_FRONT_CAMERA? croppedBitmap : flip(croppedBitmap));
                     long lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
                     logger.i("Running detection on image " + lastProcessingTimeMs);
 
-                    final List<MultipleClassifier.Recognition> mappedRecognitions = new LinkedList<>();
+                    final List<ObjectionDetector.Recognition> mappedRecognitions = new LinkedList<>();
 
-                    for (final MultipleClassifier.Recognition result : results) {
+                    for (final ObjectionDetector.Recognition result : results) {
                         final RectF location = result.getLocation();
                         if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE) {
 

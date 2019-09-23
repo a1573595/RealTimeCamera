@@ -29,7 +29,7 @@ import android.util.Pair;
 import android.util.TypedValue;
 
 import com.a1573595.realtimecamera.customView.BorderedText;
-import com.a1573595.realtimecamera.tflite.MultipleClassifier.Recognition;
+import com.a1573595.realtimecamera.tflite.ObjectionDetector.Recognition;
 
 import java.util.LinkedList;
 import java.util.List;

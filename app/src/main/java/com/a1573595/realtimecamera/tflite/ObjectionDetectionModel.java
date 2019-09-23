@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-public class ObjectionDetectionModel implements MultipleClassifier {
+public class ObjectionDetectionModel implements ObjectionDetector {
     // Float model
     private static final float IMAGE_MEAN = 128.0f;
     private static final float IMAGE_STD = 128.0f;
@@ -52,7 +52,7 @@ public class ObjectionDetectionModel implements MultipleClassifier {
 
     private void ObjectionDetectionModel() {}
 
-    public static MultipleClassifier create(
+    public static ObjectionDetector create(
             final AssetManager assetManager,
             final String modelFilename,
             final String labelFilename,
