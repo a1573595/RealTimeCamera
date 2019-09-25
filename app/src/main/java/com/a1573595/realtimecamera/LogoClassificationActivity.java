@@ -2,10 +2,12 @@ package com.a1573595.realtimecamera;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.a1573595.realtimecamera.customView.OverlayView;
 import com.a1573595.realtimecamera.tflite.ImageUtils;
 import com.a1573595.realtimecamera.tflite.MultipleClassificationModel;
 import com.a1573595.realtimecamera.tflite.MultipleClassifier;
@@ -37,7 +40,7 @@ public class LogoClassificationActivity extends CameraActivity {
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
     private static final boolean MAINTAIN_ASPECT = false;
 
-    private static final String MODEL_FILE = "logoclassify.tflite";
+    private static final String MODEL_FILE = "logoclassify3.tflite";
     private static final int MODEL_INPUT_SIZE = 224;
     private static final int NUM_ITEMS = 7;
 
@@ -52,7 +55,10 @@ public class LogoClassificationActivity extends CameraActivity {
     private Bitmap croppedBitmap = null;
 
     private Matrix frameToCropTransform;
-    private Matrix cropToFrameTransform;
+    private int scale_width = 0;
+
+    private OverlayView trackingOverlay;
+    private Paint paint;
 
     private TextView tv_debug;
     private String[] logos = new String[]{"Carleton","McMaster","Trent","Uoit","UoT","Waterloo", "Background"};
@@ -95,9 +101,7 @@ public class LogoClassificationActivity extends CameraActivity {
                         if(state.ordinal()==3); // Start
                         if(state.ordinal()==5 && serial == serialStatus){   //End
                             robotAPI.robot.setExpression(RobotFace.HIDEFACE);
-                            robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xff);
                             robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0x00FF00);
-                            robotAPI.wheelLights.setBrightness(WheelLights.Lights.SYNC_BOTH, 0xff, 25);
 
                             Arrays.fill(frameArray, -1);
                             serialStatus = -1;
@@ -152,7 +156,7 @@ public class LogoClassificationActivity extends CameraActivity {
     @Override
     protected void onPreviewSizeChosen(Size size, int rotation) {
         HAS_FRONT_CAMERA = hasFrontCamera();
-
+        // Initialize TensorFlow Lite module
         try {
             detector =
                     MultipleClassificationModel.create(
@@ -169,24 +173,47 @@ public class LogoClassificationActivity extends CameraActivity {
 
         previewWidth = size.getWidth();
         previewHeight = size.getHeight();
+        logger.i(getString(R.string.initializing_size, previewWidth, previewHeight));
 
         int sensorOrientation = rotation - getScreenOrientation();
-
         logger.i(getString(R.string.camera_orientation_relative, sensorOrientation));
 
-        logger.i(getString(R.string.initializing_size, previewWidth, previewHeight));
+        trackingOverlay = findViewById(R.id.tracking_overlay);
+
+        int h = trackingOverlay.getMeasuredHeight();
+        int w = trackingOverlay.getMeasuredWidth();
+        int preview_scale = h > w ? w / DESIRED_PREVIEW_SIZE.getWidth() :
+                h / DESIRED_PREVIEW_SIZE.getHeight();  //預覽畫面放大比例
+        int crop_scale = DESIRED_PREVIEW_SIZE.getWidth()/MODEL_INPUT_SIZE;   //預覽畫面與擷取影像比例
+        float scale = preview_scale * crop_scale / 2;
+
+        RectF rectF = new RectF(
+                (w / 2) - (MODEL_INPUT_SIZE * scale),
+                (h / 2) - (MODEL_INPUT_SIZE * scale),
+                (w / 2) + (MODEL_INPUT_SIZE * scale),
+                (h / 2) + (MODEL_INPUT_SIZE * scale)
+        );
+        scale_width = (int)(rectF.width() / scale);
+
+        paint = new Paint();
+        paint.setAntiAlias(true);//消除鋸齒
+        paint.setStrokeWidth(25);//設置畫筆的寬度
+        paint.setStyle(Paint.Style.STROKE);//設置繪製輪廓
+        paint.setColor(Color.RED);//設置顏色
+
+        trackingOverlay.addCallback(
+                canvas -> canvas.drawRect(rectF, paint));
+
         rgbFrameBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
         croppedBitmap = Bitmap.createBitmap(MODEL_INPUT_SIZE, MODEL_INPUT_SIZE, Bitmap.Config.ARGB_8888);
 
         frameToCropTransform =
                 ImageUtils.getTransformationMatrix(
-                        previewWidth, previewHeight,
+                        scale_width, scale_width,
                         MODEL_INPUT_SIZE, MODEL_INPUT_SIZE,
                         sensorOrientation,
                         MAINTAIN_ASPECT
                 );
-        cropToFrameTransform = new Matrix();
-        frameToCropTransform.invert(cropToFrameTransform);
     }
 
     private boolean hasFrontCamera() {
@@ -213,22 +240,27 @@ public class LogoClassificationActivity extends CameraActivity {
         logger.i("Preparing image " + currTimestamp + " for module in bg thread.");
 
         rgbFrameBitmap.setPixels(getRgbBytes(), 0, previewWidth, 0, 0, previewWidth, previewHeight);
-
         readyForNextImage();
 
         final Canvas canvas = new Canvas(croppedBitmap);
-        canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
+        canvas.drawBitmap(cropBitmap(rgbFrameBitmap, scale_width), frameToCropTransform, null);
 
         runInBackground(
                 () -> {
                     final long startTime = SystemClock.uptimeMillis();
-                    // 輸出結果
+                    // Module output
                     final float[] results = detector.recognizeImage(
                             HAS_FRONT_CAMERA? croppedBitmap : flip(croppedBitmap));
                     long lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
                     logger.i("Running detection on image " + lastProcessingTimeMs);
 
                     final int index_logo = findMaxIndex(results);
+                    if(index_logo==NUM_ITEMS-1)
+                        paint.setColor(Color.RED);
+                    else
+                        paint.setColor(Color.GREEN);
+                    trackingOverlay.postInvalidate();
+
                     computingImage = false;
 
                     runOnUiThread(
@@ -252,7 +284,7 @@ public class LogoClassificationActivity extends CameraActivity {
                 });
     }
 
-    public Bitmap toGrayscale(Bitmap bmpOriginal) {
+    private Bitmap toGrayscale(Bitmap bmpOriginal) {
         int width, height;
         height = bmpOriginal.getHeight();
         width = bmpOriginal.getWidth();
@@ -266,6 +298,14 @@ public class LogoClassificationActivity extends CameraActivity {
         paint.setColorFilter(f);
         c.drawBitmap(bmpOriginal, 0, 0, paint);
         return bmpGrayscale;
+    }
+    //從中間截取一個正方形
+    public Bitmap cropBitmap(Bitmap bitmap, int cropWidth) {
+        int w = bitmap.getWidth(); // 得到圖片的寬，高
+        int h = bitmap.getHeight();
+
+        return Bitmap.createBitmap(bitmap, (w - cropWidth) / 2,
+                (h - cropWidth) / 2, cropWidth, cropWidth);
     }
 
     private Bitmap flip(Bitmap d) {
@@ -328,8 +368,7 @@ public class LogoClassificationActivity extends CameraActivity {
                 RobotFace.HAPPY,
                 -1
         );
-        robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xff);
+
         robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0xFFFF00);
-        robotAPI.wheelLights.setBrightness(WheelLights.Lights.SYNC_BOTH, 0xff, 25);
     }
 }

@@ -129,7 +129,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
                     camera.addCallbackBuffer(new byte[ImageUtils.getYUVByteSize(s.width, s.height)]);
 
                     textureView.setAspectRatio(s.width, s.height);
-
+                    // Calculate the Container size
                     View container = getActivity().findViewById(R.id.container);
                     ViewGroup.LayoutParams lp = container.getLayoutParams();
                     float aspectRatio = (float)s.width/(float)s.height;
