@@ -40,7 +40,7 @@ public class LogoClassificationActivity extends CameraActivity {
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
     private static final boolean MAINTAIN_ASPECT = false;
 
-    private static final String MODEL_FILE = "logoclassify3.tflite";
+    private static final String MODEL_FILE = "logoclassify4.tflite";
     private static final int MODEL_INPUT_SIZE = 224;
     private static final int NUM_ITEMS = 7;
 
@@ -99,15 +99,16 @@ public class LogoClassificationActivity extends CameraActivity {
                 switch (RobotCommand.getRobotCommand(cmd).name()) {
                     case "SPEAK":
                         if(state.ordinal()==3); // Start
+                        break;
+                    case "PLAY_EMOTIONAL_ACTION":
+                        break;
+                    case "SET_EXPRESSION":
                         if(state.ordinal()==5 && serial == serialStatus){   //End
                             robotAPI.robot.setExpression(RobotFace.HIDEFACE);
-                            robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0x00FF00);
 
                             Arrays.fill(frameArray, -1);
                             serialStatus = -1;
                         }
-                        break;
-                    case "PLAY_EMOTIONAL_ACTION":
                         break;
                 }
             }
@@ -255,10 +256,13 @@ public class LogoClassificationActivity extends CameraActivity {
                     logger.i("Running detection on image " + lastProcessingTimeMs);
 
                     final int index_logo = findMaxIndex(results);
-                    if(index_logo==NUM_ITEMS-1)
+                    if(index_logo==NUM_ITEMS-1) {
                         paint.setColor(Color.RED);
-                    else
+                        robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0xFF0000);
+                    }else {
                         paint.setColor(Color.GREEN);
+                        robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0x00FF00);
+                    }
                     trackingOverlay.postInvalidate();
 
                     computingImage = false;
@@ -342,33 +346,33 @@ public class LogoClassificationActivity extends CameraActivity {
 
     private void zenboTalking(int index) {
         String sentence;
+        // ACTIVE、CONFIDENT、EXPECTING、HAPPY、INTERESTED、PLEASED、PROUD、SINGING
+        RobotFace face = RobotFace.HAPPY;
+
         switch (index) {
             case 0:
-                sentence = "Carleton University";
+                sentence = "Carleton University, it is a public comprehensive university in Ottawa.";
                 break;
             case 1:
-                sentence = "McMaster University";
+                sentence = "McMaster University, it is seen as a science-oriented university, and is known for it's medical school.";
                 break;
             case 2:
-                sentence = "Trent University";
+                sentence = "Trent University, it is a public university in Peterborough.";
                 break;
             case 3:
-                sentence = "Ontario Tech University";
+                sentence = "Ontario Tech University, I work on there, it is a great place.";
+                face = RobotFace.PROUD;
                 break;
             case 4:
-                sentence = "University of Toronto";
+                sentence = "University of Toronto, it is a globally top-ranked public research university.";
+                face = RobotFace.EXPECTING;
                 break;
             default:
-                sentence = "University of Waterloo";
+                sentence = "University of Waterloo, it is most famous for its co-operative education programs.";
+                face = RobotFace.INTERESTED;
                 break;
         }
 
-        serialStatus = robotAPI.robot.speak(sentence);
-        robotAPI.utility.playEmotionalAction(
-                RobotFace.HAPPY,
-                -1
-        );
-
-        robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0xFFFF00);
+        serialStatus = robotAPI.robot.setExpression(face, sentence);
     }
 }

@@ -25,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         robotAPI = new RobotAPI(getApplicationContext());
+        robotAPI.robot.setPressOnHeadAction(false); //disable press on head action
+        robotAPI.robot.setTouchOnlySignal(false);   //disable "touch only" on top of screen if user trigger by "Hey Zenbo"
+        robotAPI.robot.setVoiceTrigger(false);  //disable dialog system voice trigger
         robotAPI.motion.moveHead(0,30, MotionControl.SpeedLevel.Head.L1);
         robotAPI.robot.setExpression(RobotFace.HIDEFACE);
 
