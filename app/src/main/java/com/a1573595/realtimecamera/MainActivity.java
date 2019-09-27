@@ -48,4 +48,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(robotAPI!=null)
+            robotAPI.release();
+    }
 }

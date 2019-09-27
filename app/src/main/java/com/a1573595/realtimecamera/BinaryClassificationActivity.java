@@ -126,13 +126,6 @@ public class BinaryClassificationActivity extends CameraActivity {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        if(robotAPI!=null)
-            robotAPI.robot.unregisterListenCallback();
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         if(robotAPI!=null)

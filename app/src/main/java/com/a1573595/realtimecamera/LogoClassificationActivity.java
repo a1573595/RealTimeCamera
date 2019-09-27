@@ -40,7 +40,7 @@ public class LogoClassificationActivity extends CameraActivity {
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
     private static final boolean MAINTAIN_ASPECT = false;
 
-    private static final String MODEL_FILE = "logoclassify4.tflite";
+    private static final String MODEL_FILE = "logoclassify2.tflite";
     private static final int MODEL_INPUT_SIZE = 224;
     private static final int NUM_ITEMS = 7;
 
@@ -133,13 +133,6 @@ public class LogoClassificationActivity extends CameraActivity {
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         );
         computingImage = false;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if(robotAPI!=null)
-            robotAPI.robot.unregisterListenCallback();
     }
 
     @Override
@@ -351,25 +344,25 @@ public class LogoClassificationActivity extends CameraActivity {
 
         switch (index) {
             case 0:
-                sentence = "Carleton University, it is a public comprehensive university in Ottawa.";
+                sentence = "Carleton University, it is a public comprehensive university in Ottawa. We are good friends.";
                 break;
             case 1:
-                sentence = "McMaster University, it is seen as a science-oriented university, and is known for it's medical school.";
+                sentence = "McMaster University, it is seen as a science-oriented university, and is known for it's medical school. I  have a lot of friends on campus over there.";
                 break;
             case 2:
-                sentence = "Trent University, it is a public university in Peterborough.";
+                sentence = "Trent University, it is a public university in Peterborough. We are partners for a long time.";
                 break;
             case 3:
-                sentence = "Ontario Tech University, I work on there, it is a great place.";
-                face = RobotFace.PROUD;
+                sentence = "Ontario Tech University, I work on there, it is a great place. You should study there. I look forward to seeing you there at Ontario Tech University on campus.";
+                face = RobotFace.SHY;
                 break;
             case 4:
-                sentence = "University of Toronto, it is a globally top-ranked public research university.";
+                sentence = "University of Toronto, We Ontario Tech University has a lot of faculty members graduated from there.";
                 face = RobotFace.EXPECTING;
                 break;
             default:
-                sentence = "University of Waterloo, it is most famous for its co-operative education programs.";
-                face = RobotFace.INTERESTED;
+                sentence = "University of Waterloo, it is most famous for its co-operative education programs. We are good research partners.";
+                face = RobotFace.WORRIED;
                 break;
         }
 
