@@ -26,7 +26,8 @@ public class BinaryClassificationModel implements BinaryClassifier {
     private ByteBuffer imgData;
     private float[][] outResult = new float[1][1];
 
-    private void BinaryClassificationModel() {}
+    private void BinaryClassificationModel() {
+    }
 
     public static BinaryClassifier create(
             final AssetManager assetManager,
@@ -57,12 +58,12 @@ public class BinaryClassificationModel implements BinaryClassifier {
         d.imgData.order(ByteOrder.nativeOrder());
         d.intValues = new int[d.inputSize * d.inputSize];
 
-        d.tfLite.setNumThreads(2);
-
         return d;
     }
 
-    /** Memory-map the model file in Assets. */
+    /**
+     * Memory-map the model file in Assets.
+     */
     static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename) throws IOException {
         AssetFileDescriptor fileDescriptor = assets.openFd(modelFilename);
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
@@ -97,11 +98,6 @@ public class BinaryClassificationModel implements BinaryClassifier {
 
         tfLite.run(imgData, outResult);
 
-        return outResult[0][0]>0.5f;
-    }
-
-    @Override
-    public void setNumThreads(int threads) {
-        tfLite.setNumThreads(threads);
+        return outResult[0][0] > 0.5f;
     }
 }

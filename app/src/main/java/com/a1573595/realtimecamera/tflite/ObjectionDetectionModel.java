@@ -92,7 +92,6 @@ public class ObjectionDetectionModel implements ObjectionDetector {
         d.imgData.order(ByteOrder.nativeOrder());
         d.intValues = new int[d.inputSize * d.inputSize];
 
-        d.tfLite.setNumThreads(2);
         d.outputLocations = new float[1][NUM_DETECTIONS][4];
         d.outputClasses = new float[1][NUM_DETECTIONS];
         d.outputScores = new float[1][NUM_DETECTIONS];
@@ -170,10 +169,5 @@ public class ObjectionDetectionModel implements ObjectionDetector {
         }
 
         return recognitions;
-    }
-
-    @Override
-    public void setNumThreads(int threads) {
-        tfLite.setNumThreads(threads);
     }
 }

@@ -8,8 +8,6 @@ import java.util.List;
 public interface ObjectionDetector {
     List<Recognition> recognizeImage(Bitmap bitmap);
 
-    void setNumThreads(int num_threads);
-
     public class Recognition {
         /**
          * A unique identifier for what has been recognized. Specific to the class, not the instance of
@@ -17,7 +15,9 @@ public interface ObjectionDetector {
          */
         private final String id;
 
-        /** Display name for the recognition. */
+        /**
+         * Display name for the recognition.
+         */
         private final String title;
 
         /**
@@ -25,7 +25,9 @@ public interface ObjectionDetector {
          */
         private final Float confidence;
 
-        /** Optional location within the source image for the location of the recognized object. */
+        /**
+         * Optional location within the source image for the location of the recognized object.
+         */
         private RectF location;
 
         public Recognition(

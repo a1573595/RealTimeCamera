@@ -13,7 +13,7 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-public class MultipleClassificationModel implements MultipleClassifier{
+public class MultipleClassificationModel implements MultipleClassifier {
     // Float model
     private static final float IMAGE_MEAN = 0f;
     private static final float IMAGE_STD = 255.0f;
@@ -26,7 +26,8 @@ public class MultipleClassificationModel implements MultipleClassifier{
     private ByteBuffer imgData;
     private float[][] outResult;
 
-    private void MultipleClassificationModel() {}
+    private void MultipleClassificationModel() {
+    }
 
     public static MultipleClassifier create(
             final AssetManager assetManager,
@@ -58,14 +59,14 @@ public class MultipleClassificationModel implements MultipleClassifier{
         d.imgData.order(ByteOrder.nativeOrder());
         d.intValues = new int[d.inputSize * d.inputSize];
 
-        d.tfLite.setNumThreads(2);
-
         d.outResult = new float[1][num_items];
 
         return d;
     }
 
-    /** Memory-map the model file in Assets. */
+    /**
+     * Memory-map the model file in Assets.
+     */
     static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename) throws IOException {
         AssetFileDescriptor fileDescriptor = assets.openFd(modelFilename);
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
@@ -101,10 +102,5 @@ public class MultipleClassificationModel implements MultipleClassifier{
         tfLite.run(imgData, outResult);
 
         return outResult[0];
-    }
-
-    @Override
-    public void setNumThreads(int threads) {
-        tfLite.setNumThreads(threads);
     }
 }

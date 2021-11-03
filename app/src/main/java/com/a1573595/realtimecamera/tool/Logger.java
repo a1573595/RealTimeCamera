@@ -13,22 +13,22 @@ public class Logger {
     }
 
     public void d(String msg) {
-        if(isDebug)
+        if (isDebug)
             Log.d(tag, msg);
     }
 
     public void e(String msg) {
-        if(isDebug)
+        if (isDebug)
             Log.e(tag, msg);
     }
 
     public void i(String msg) {
-        if(isDebug)
+        if (isDebug)
             Log.i(tag, msg);
     }
 
     public void w(String msg) {
-        if(isDebug)
+        if (isDebug)
             Log.w(tag, msg);
     }
 }

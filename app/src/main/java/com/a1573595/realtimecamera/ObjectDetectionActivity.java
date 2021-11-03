@@ -159,7 +159,7 @@ public class ObjectDetectionActivity extends CameraActivity {
                     final long startTime = SystemClock.uptimeMillis();
                     // 輸出結果
                     final List<ObjectionDetector.Recognition> results = detector.recognizeImage(
-                            HAS_FRONT_CAMERA? croppedBitmap : flip(croppedBitmap));
+                            HAS_FRONT_CAMERA ? croppedBitmap : flip(croppedBitmap));
                     long lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
                     logger.i("Running detection on image " + lastProcessingTimeMs);
 
@@ -183,7 +183,7 @@ public class ObjectDetectionActivity extends CameraActivity {
 
                     runOnUiThread(
                             () -> {
-                                tv_debug.setText(lastProcessingTimeMs +"ms");
+                                tv_debug.setText(lastProcessingTimeMs + "ms");
                             });
                 });
     }

@@ -132,8 +132,8 @@ public class LegacyCameraConnectionFragment extends Fragment {
                     // Calculate the Container size
                     View container = getActivity().findViewById(R.id.container);
                     ViewGroup.LayoutParams lp = container.getLayoutParams();
-                    float aspectRatio = (float)s.width/(float)s.height;
-                    lp.width = Math.round(height*aspectRatio);
+                    float aspectRatio = (float) s.width / (float) s.height;
+                    lp.width = Math.round(height * aspectRatio);
                     container.setLayoutParams(lp);
 
                     camera.startPreview();
@@ -141,7 +141,8 @@ public class LegacyCameraConnectionFragment extends Fragment {
 
                 @Override
                 public void onSurfaceTextureSizeChanged(
-                        final SurfaceTexture texture, final int width, final int height) {}
+                        final SurfaceTexture texture, final int width, final int height) {
+                }
 
                 @Override
                 public boolean onSurfaceTextureDestroyed(final SurfaceTexture texture) {
@@ -149,7 +150,8 @@ public class LegacyCameraConnectionFragment extends Fragment {
                 }
 
                 @Override
-                public void onSurfaceTextureUpdated(final SurfaceTexture texture) {}
+                public void onSurfaceTextureUpdated(final SurfaceTexture texture) {
+                }
             };
 
     private int getCameraId() {
@@ -206,7 +208,9 @@ public class LegacyCameraConnectionFragment extends Fragment {
         }
     }
 
-    /** Compares two {@code Size}s based on their areas. */
+    /**
+     * Compares two {@code Size}s based on their areas.
+     */
     private class CompareSizesByArea implements Comparator<Size> {
         @Override
         public int compare(final Size lhs, final Size rhs) {
@@ -216,13 +220,17 @@ public class LegacyCameraConnectionFragment extends Fragment {
         }
     }
 
-    /** Starts a background thread and its {@link Handler}. */
+    /**
+     * Starts a background thread and its {@link Handler}.
+     */
     private void startBackgroundThread() {
         backgroundThread = new HandlerThread("CameraBackground");
         backgroundThread.start();
     }
 
-    /** Stops the background thread and its {@link Handler}. */
+    /**
+     * Stops the background thread and its {@link Handler}.
+     */
     private void stopBackgroundThread() {
         backgroundThread.quitSafely();
         try {

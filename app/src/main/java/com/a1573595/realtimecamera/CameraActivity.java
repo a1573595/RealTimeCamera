@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment;
 import com.a1573595.realtimecamera.tflite.ImageUtils;
 import com.a1573595.realtimecamera.tool.Logger;
 
-public abstract class CameraActivity extends BaseActivity implements Camera.PreviewCallback{
+public abstract class CameraActivity extends BaseActivity implements Camera.PreviewCallback {
     private Logger logger = new Logger(this.getClass());
 
     private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
@@ -40,8 +40,8 @@ public abstract class CameraActivity extends BaseActivity implements Camera.Prev
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CAMERA) {
-            for(int result:grantResults){
-                if(result != PackageManager.PERMISSION_GRANTED){
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
                     requestPermission(REQUEST_CAMERA, PERMISSION_CAMERA);
                     return;
                 }
@@ -59,9 +59,9 @@ public abstract class CameraActivity extends BaseActivity implements Camera.Prev
 
         setContentView(R.layout.activity_camera);
 
-        if(!hasPermissions(PERMISSION_CAMERA)) {
+        if (!hasPermissions(PERMISSION_CAMERA)) {
             requestPermission(REQUEST_CAMERA, PERMISSION_CAMERA);
-        } else{
+        } else {
             initCamera();
         }
     }
@@ -117,7 +117,7 @@ public abstract class CameraActivity extends BaseActivity implements Camera.Prev
 
     @Override
     public synchronized void onResume() {
-        logger.d("onResume "+ this);
+        logger.d("onResume " + this);
         super.onResume();
 
         handlerThread = new HandlerThread("inference");
@@ -143,13 +143,13 @@ public abstract class CameraActivity extends BaseActivity implements Camera.Prev
 
     @Override
     public synchronized void onStop() {
-        logger.d("onStop "+ this);
+        logger.d("onStop " + this);
         super.onStop();
     }
 
     @Override
     public synchronized void onDestroy() {
-        logger.d("onDestroy "+ this);
+        logger.d("onDestroy " + this);
         super.onDestroy();
     }
 

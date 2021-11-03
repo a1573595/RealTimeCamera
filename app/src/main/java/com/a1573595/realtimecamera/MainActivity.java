@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         robotAPI.robot.setPressOnHeadAction(false); //disable press on head action
         robotAPI.robot.setTouchOnlySignal(false);   //disable "touch only" on top of screen if user trigger by "Hey Zenbo"
         robotAPI.robot.setVoiceTrigger(false);  //disable dialog system voice trigger
-        robotAPI.motion.moveHead(0,30, MotionControl.SpeedLevel.Head.L1);
+        robotAPI.motion.moveHead(0, 30, MotionControl.SpeedLevel.Head.L1);
         robotAPI.robot.setExpression(RobotFace.HIDEFACE);
 
         listView = findViewById(R.id.listview);
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(robotAPI!=null)
+        if (robotAPI != null)
             robotAPI.release();
     }
 }

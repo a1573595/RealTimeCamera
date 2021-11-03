@@ -61,7 +61,7 @@ public class LogoClassificationActivity extends CameraActivity {
     private Paint paint;
 
     private TextView tv_debug;
-    private String[] logos = new String[]{"Carleton","McMaster","Trent","Uoit","UoT","Waterloo", "Background"};
+    private String[] logos = new String[]{"Carleton", "McMaster", "Trent", "Uoit", "UoT", "Waterloo", "Background"};
 
     private RobotAPI robotAPI;
     private RobotCallback robotCallback;
@@ -98,12 +98,12 @@ public class LogoClassificationActivity extends CameraActivity {
 
                 switch (RobotCommand.getRobotCommand(cmd).name()) {
                     case "SPEAK":
-                        if(state.ordinal()==3); // Start
+                        if (state.ordinal() == 3) ; // Start
                         break;
                     case "PLAY_EMOTIONAL_ACTION":
                         break;
                     case "SET_EXPRESSION":
-                        if(state.ordinal()==5 && serial == serialStatus){   //End
+                        if (state.ordinal() == 5 && serial == serialStatus) {   //End
                             robotAPI.robot.setExpression(RobotFace.HIDEFACE);
 
                             Arrays.fill(frameArray, -1);
@@ -138,7 +138,7 @@ public class LogoClassificationActivity extends CameraActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(robotAPI!=null)
+        if (robotAPI != null)
             robotAPI.release();
     }
 
@@ -178,7 +178,7 @@ public class LogoClassificationActivity extends CameraActivity {
         int w = trackingOverlay.getMeasuredWidth();
         int preview_scale = h > w ? w / DESIRED_PREVIEW_SIZE.getWidth() :
                 h / DESIRED_PREVIEW_SIZE.getHeight();  //預覽畫面放大比例
-        int crop_scale = DESIRED_PREVIEW_SIZE.getWidth()/MODEL_INPUT_SIZE;   //預覽畫面與擷取影像比例
+        int crop_scale = DESIRED_PREVIEW_SIZE.getWidth() / MODEL_INPUT_SIZE;   //預覽畫面與擷取影像比例
         float scale = preview_scale * crop_scale / 2;
 
         RectF rectF = new RectF(
@@ -187,7 +187,7 @@ public class LogoClassificationActivity extends CameraActivity {
                 (w / 2) + (MODEL_INPUT_SIZE * scale),
                 (h / 2) + (MODEL_INPUT_SIZE * scale)
         );
-        scale_width = (int)(rectF.width() / scale);
+        scale_width = (int) (rectF.width() / scale);
 
         paint = new Paint();
         paint.setAntiAlias(true);//消除鋸齒
@@ -244,15 +244,15 @@ public class LogoClassificationActivity extends CameraActivity {
                     final long startTime = SystemClock.uptimeMillis();
                     // Module output
                     final float[] results = detector.recognizeImage(
-                            HAS_FRONT_CAMERA? croppedBitmap : flip(croppedBitmap));
+                            HAS_FRONT_CAMERA ? croppedBitmap : flip(croppedBitmap));
                     long lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
                     logger.i("Running detection on image " + lastProcessingTimeMs);
 
                     final int index_logo = findMaxIndex(results);
-                    if(index_logo==NUM_ITEMS-1) {
+                    if (index_logo == NUM_ITEMS - 1) {
                         paint.setColor(Color.RED);
                         robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0xFF0000);
-                    }else {
+                    } else {
                         paint.setColor(Color.GREEN);
                         robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0x00FF00);
                     }
@@ -269,12 +269,12 @@ public class LogoClassificationActivity extends CameraActivity {
                                         logos[4], results[4], logos[5], results[5],
                                         logos[6], results[6], logos[index_logo]));
 
-                                if(serialStatus!=-1) return;
-                                for(int i=frameArray.length-1;i>=0;i--){
-                                    frameArray[i] = ((i>0)?frameArray[i-1]:index_logo);
+                                if (serialStatus != -1) return;
+                                for (int i = frameArray.length - 1; i >= 0; i--) {
+                                    frameArray[i] = ((i > 0) ? frameArray[i - 1] : index_logo);
                                 }
 
-                                if(index_logo!=NUM_ITEMS-1 && isSame(frameArray)) {
+                                if (index_logo != NUM_ITEMS - 1 && isSame(frameArray)) {
                                     zenboTalking(index_logo);
                                 }
                             });
@@ -296,6 +296,7 @@ public class LogoClassificationActivity extends CameraActivity {
         c.drawBitmap(bmpOriginal, 0, 0, paint);
         return bmpGrayscale;
     }
+
     //從中間截取一個正方形
     public Bitmap cropBitmap(Bitmap bitmap, int cropWidth) {
         int w = bitmap.getWidth(); // 得到圖片的寬，高
@@ -317,8 +318,8 @@ public class LogoClassificationActivity extends CameraActivity {
         int index = 0;
         float max = 0;
 
-        for (int i=0;i<array.length;i++){
-            if(array[i]>max){
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] > max) {
                 max = array[i];
                 index = i;
             }
@@ -328,8 +329,8 @@ public class LogoClassificationActivity extends CameraActivity {
 
     private boolean isSame(int[] array) {
         boolean isSame = true;
-        for (int i=0;i<array.length-1;i++){
-            if(array[i]!=array[i+1]){
+        for (int i = 0; i < array.length - 1; i++) {
+            if (array[i] != array[i + 1]) {
                 isSame = false;
                 break;
             }

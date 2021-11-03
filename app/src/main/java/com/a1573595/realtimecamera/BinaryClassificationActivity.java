@@ -87,8 +87,8 @@ public class BinaryClassificationActivity extends CameraActivity {
 
                 switch (RobotCommand.getRobotCommand(cmd).name()) {
                     case "SPEAK":
-                        if(state.ordinal()==3); // Start
-                        if(state.ordinal()==5 && serial == serialStatus){   //End
+                        if (state.ordinal() == 3) ; // Start
+                        if (state.ordinal() == 5 && serial == serialStatus) {   //End
                             robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                             robotAPI.wheelLights.turnOff(WheelLights.Lights.SYNC_BOTH, 0xff);
                             robotAPI.wheelLights.setColor(WheelLights.Lights.SYNC_BOTH, 0xff, 0x00FF00);
@@ -128,7 +128,7 @@ public class BinaryClassificationActivity extends CameraActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(robotAPI!=null)
+        if (robotAPI != null)
             robotAPI.release();
     }
 
@@ -211,22 +211,22 @@ public class BinaryClassificationActivity extends CameraActivity {
                     final long startTime = SystemClock.uptimeMillis();
                     // 輸出結果
                     final boolean result = detector.recognizeImage(
-                            HAS_FRONT_CAMERA? croppedBitmap : flip(croppedBitmap));
+                            HAS_FRONT_CAMERA ? croppedBitmap : flip(croppedBitmap));
                     long lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
                     logger.i("Running detection on image " + lastProcessingTimeMs);
 
                     computingImage = false;
                     runOnUiThread(
                             () -> {
-                                tv_debug.setText(lastProcessingTimeMs +"ms\n"+ result);
+                                tv_debug.setText(lastProcessingTimeMs + "ms\n" + result);
 
-                                if(serialStatus!=-1) return;
+                                if (serialStatus != -1) return;
 
-                                for(int i=frameArray.length-1;i>=0;i--){
-                                    frameArray[i] = ((i>0)?frameArray[i-1]:result);
+                                for (int i = frameArray.length - 1; i >= 0; i--) {
+                                    frameArray[i] = ((i > 0) ? frameArray[i - 1] : result);
                                 }
 
-                                if(Arrays.equals(frameArray, new boolean[]{true, true, true})) {
+                                if (Arrays.equals(frameArray, new boolean[]{true, true, true})) {
                                     serialStatus = robotAPI.robot.speak("Please don't hurt me, I can tell you some secrets about Patrick.");
                                     robotAPI.utility.playEmotionalAction(
                                             RobotFace.SHOCKED,
